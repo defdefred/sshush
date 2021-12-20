@@ -105,7 +105,7 @@ This identity file could always be the same and be careful the size is 1KB max.
 
 To send it to the new contact, you need to encrypt it using the receiver SSH public key and make the final filename your SSH public key:
 ```
-$ age -R ./id_ed25519.pub > AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+$ age -R ./id_ed25519.pub identity.tgz > AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 ```
 Sending the request:
 ```
