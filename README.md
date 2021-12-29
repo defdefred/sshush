@@ -42,9 +42,9 @@ Request for agreement is uploaded to a dedicated folder per receiver email. You 
 
 The server is regulary checking the folders and transmetting the request to the dedicated folder in the receiver storage.
 
-
-
 ## Regular contact
+
+
 
 # Client side operation
 
