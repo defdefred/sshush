@@ -20,10 +20,14 @@ Example of ed25519 ssh public keys:
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA John Doe (id_ed25519)
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_2)
 ```
-Proposal for SSHush email presentation:
+Proposal for SSHush email presentation, base64 is change to `_` + base58 for filename and username compatibility:
+root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAIH9KYKsxtAzdOQ8mfC3unjGiFfPmILGymUbPi6bGixEH | base64 -d | base58
+111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
+root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA | base64 -d | base58
+111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
 ```
-<John Doe>AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA[server1,server2]
-<Jane Doe>AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs[server3,server4]
+<John Doe>_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU[server1,server2]
+<Jane Doe>_111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[server3,server4]
 ```
 QRcode welcome!
 
@@ -165,4 +169,22 @@ total 16
 ---------- 1 _ _  594 Dec 17 00:29 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 ```
 ## Regular contact
+```
+root@minipc1:/etc# getconf LOGIN_NAME_MAX
+256
+groupadd sshush
+root@minipc1:/chroot# /sbin/useradd --badnames -d /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU -g sshush -s /bin/false -u 1002 __
+root@minipc1:/chroot# mkdir /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
+root@minipc1:/chroot# cat /root/age/id_ed25519_2.pub > /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoUauthorized_keys
+
+`vi /etc/passwd` and `vi /etc/shadow` to change `__` by `_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU`
+root@minipc1:/chroot# sftp -i /root/age/id_ed25519_2 _111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@localhost
+Connected to localhost.
+sftp> pwd
+Remote working directory: /
+sftp> ls
+Couldn't read directory: Permission denied
+
+```
+
 
