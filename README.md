@@ -2,9 +2,9 @@
 Beyond smtp mail.
 
 # Why? Really?
-It's time to move on. All very old protocol like Telnet, FTP or SMTP are so fucked...
+It's time to move on. All very old protocol like FTP or SMTP are so fucked...
 
-You can't send binary data with SMTP, all is so bloated.
+You can't send binary data with SMTP, so all is bloated.
 
 Metadata are accessible to all.
 
@@ -13,23 +13,21 @@ SPAM must be eradicated.
 # Address
 1 user = 1 ssh public keys and one or many server where you can receive mail.
 
-Two servers are enougth for most of people to be always online.
+Two servers are enought for most of people to be always online.
 
 Example of ed25519 ssh public keys:
 ```
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA John Doe (id_ed25519)
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_2)
 ```
-Proposal for SSHush email presentation, base64 is change to `@` + base58 for filename and username compatibility:
-root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAIH9KYKsxtAzdOQ8mfC3unjGiFfPmILGymUbPi6bGixEH | base64 -d | base58
-111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
-root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA | base64 -d | base58
-111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
+Proposal for SSHush email presentation:
 ```
 <John Doe>@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@[server1,server2]
 <Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV@[server3,server4]
 ```
-QRcode welcome!
+The base64 representation is change to `@` + base58 for filename and username compatibility.
+
+QRcode are welcome!
 
 # Server side operation
 Two mecanisms:
@@ -42,7 +40,7 @@ If you are not known by the receiver, you need to ask for agreement before sendi
 
 Every server is accepting sftp connexion with a dedicated user, named `_`, using a ssh key known by everybody and with very limited command allowed.
 
-Request for agreement is uploaded to a dedicated folder per receiver email. You need to know the receiver email, folder are not browsable.
+Request for agreement is uploaded to a dedicated folder (the receiver sshush key). You need to know the receiver email, folder are not browsable.
 
 The server is regulary checking the folders and transmetting the request to the dedicated folder in the receiver storage.
 
