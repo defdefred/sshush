@@ -20,14 +20,14 @@ Example of ed25519 ssh public keys:
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA John Doe (id_ed25519)
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_2)
 ```
-Proposal for SSHush email presentation, base64 is change to `_` + base58 for filename and username compatibility:
+Proposal for SSHush email presentation, base64 is change to `@` + base58 for filename and username compatibility:
 root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAIH9KYKsxtAzdOQ8mfC3unjGiFfPmILGymUbPi6bGixEH | base64 -d | base58
 111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
 root@minipc1:/chroot# echo AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA | base64 -d | base58
 111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
 ```
-<John Doe>_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU[server1,server2]
-<Jane Doe>_111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[server3,server4]
+<John Doe>@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@[server1,server2]
+<Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV@[server3,server4]
 ```
 QRcode welcome!
 
