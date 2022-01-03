@@ -10,22 +10,22 @@ Metadata are accessible to all.
 
 SPAM must be eradicated.
 
-Should be easily home hosted.
+Should be easily home hosted or shoudn't need excessive trust to the hosting server.
 
 # Address
-1 user = 1 ssh public keys and one or many server where you can receive mail.
+1 user = 1 public ssh-key and one or many server where you can receive mail.
 
 Two servers are enought for most of people to be always online.
 
-Example of ed25519 ssh public keys:
+Example of ed25519 public ssh-keys:
 ```
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA John Doe (id_ed25519)
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_2)
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA John Doe (id_ed25519_john)
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_jane)
 ```
 Proposal for SSHush email presentation:
 ```
-<John Doe>@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@[server1,server2]
-<Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV@[server3,server4]
+<John Doe>@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU[server1,server2:2222]
+<Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[W.X.Y.Z:4444,server4]
 ```
 The sshush-key is a base58 representation of the ssh-key with `@` prefix for filename and username compatibility.
 ```
@@ -37,7 +37,6 @@ $ echo -n @ ; echo AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglry
 The protocol part of the ssh-key is kept for future compatibily with future key type.
 ```
 $ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | base64 -d
-
 ssh-ed25519
 ```
 QRcode are welcome!
@@ -51,41 +50,59 @@ Two mecanisms:
  
 If you are not known by the receiver, you need to ask for agreement before sending the first email. Agreement is easily revocable. Yes, SPAM is dead.
 
-Every server is accepting sftp connexion with a dedicated user, named `@`, using a ssh-key known by everybody and with very limited command allowed.
+Every server is accepting sftp connexion with a dedicated user, named `@`, using a ssh-key known by everybody. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
 
 Request for agreement is uploaded to a dedicated folder (the receiver sshush-key). You need to know the receiver email, folder are not browsable.
 
 The filename of the request for agreement is the requester sshush-key and the max file size is 1KB. The content is a tar file with:
-- "RFA": the request for agreement which is utf-8 text encryted with the receiver sshush-key using the `age` or `rage` tool.
-- "RFA.sig": the signing of the request for agreement with the requester ssh public key. 
+- "RFA": the request for agreement which is utf-8 text encryted with the receiver public ssh-key using the `age` or `rage` tool for privacy.
+- "RFA.sig": the signing of the request for agreement with the requester private ssh-key. 
 
-The server is capable to make signature validation, but not to access the request for agreement content.
+The server is capable to make signature validation, but not to access the RFA content.
 
-The server is regulary checking the folders and validating/transmetting the request to the dedicated folder in the receiver storage.
+The server is regulary checking the folders to:
+- validating/transmetting the request to the dedicated folder in the receiver storage.
+- suppress false request with bad signature.
 
 ## Regular contact
 
-When the request for agreement is validated by the receiver, your public ssh-key is configured on all server used by the receiver and your can connect with sftp using the receiver sshush key as login name.
+When the request for agreement is validated by the receiver, your public ssh-key is configured on all server used by the receiver and your can connect with sftp using the receiver sshush key as login name. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
 
-You are only authorized to upload files to a dedicated folder. Files must be encryted with the receiver sshush-key using the `age` or `rage` tool. No need to sign, because you are already authentified with your public ssh-key.
+You are only authorized to upload files to a dedicated folder. The file format is again a tar file with encrytion and signature but without the 1KB limitation. Filenames must be different, because you can't overwrite files. A timestap could help.
 
-faut-il chiffrer puis signer (serveur peut valider mais aussi tricher) ou signer puis chiffrer (server ne peut pas tricher/tromper)
+The encrypted file content is the real message and the format is TBD. Maybe pure text with url detection and pure data with file extension could suffice.
+Example:
+```
+date -u '+%s'
+1641250382
 
+1641250382.txt = "Hello John, look at this"
+1641250383.jpg
+```
+
+## Contact management
+
+The server need to manager the receiver `authorized_keys` with all validated public ssh-key of senders.
+The server is regulary building the `authorized_keys` using a `allowed_signers` anonymous standard ssh file.
+```
+cat > allowed_signers
+@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+^D
+```
 
 # Client side operation
-
+`
 ## Asking for Primary contact
 
-You need to create a `identity` file signed with your public key: 
+You need to create a `RAF` file with private information only for the receiver (ex: your real name):
 ```
-$ cat > identity
-test freD
-$ ssh-keygen -Y sign -f ./id_ed25519_2 -n email identity
-Signing file identity
-Write signature to identity.sig
-$ tar zcf identity.tgz identity identity.sig
+$ echo "freD SSHush" | age -R ./id_ed25519_john.pub > RAF
+$ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush RAF
+Signing file RAF
+Write signature to RAF.sig
+$ tar zcf AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs RAF RAF.sig
 ```
-This identity file could always be the same and be careful the size is 1KB max.
+This RAF tar file could always be the same and be careful the size is 1KB max.
 
 To send it to the new contact, you need to encrypt it using the receiver SSH public key and make the final filename your SSH public key:
 ```
