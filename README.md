@@ -52,7 +52,7 @@ If you are not known by the receiver, you need to ask for agreement before sendi
 
 Every server is accepting sftp connexion with a dedicated user, named `@`, using a ssh-key known by everybody. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
 
-Request for agreement is uploaded to a dedicated folder (the receiver sshush-key). You need to know the receiver email, folder are not browsable.
+Request for agreement is uploaded to a dedicated folder (the receiver sshush-key). You need to know the receiver email, folders are not browsable.
 
 The filename of the request for agreement is the requester sshush-key and the max file size is 1KB. The content is a tar file with:
 - "RFA": the request for agreement which is utf-8 text encryted with the receiver public ssh-key using the `age` or `rage` tool for privacy.
@@ -70,7 +70,7 @@ When the request for agreement is validated by the receiver, your public ssh-key
 
 You are only authorized to upload files to a dedicated folder. The file format is again a tar file with encrytion and signature but without the 1KB limitation. Filenames must be different, because you can't overwrite files. A timestap could help.
 
-The encrypted file content is the real message and the format is TBD. Maybe pure text with url detection and pure data with file extension could suffice.
+The encrypted file content is the real message and the format is TBD. Maybe pure text with url detection and pure data with file extension is enougth.
 Example:
 ```
 date -u '+%s'
@@ -96,60 +96,44 @@ cat > allowed_signers
 
 You need to create a `RAF` file with private information only for the receiver (ex: your real name):
 ```
-$ echo "freD SSHush" | age -R ./id_ed25519_john.pub > RAF
+$ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[W.X.Y.Z:4444,server4]" | age -R ./id_ed25519_john.pub > RAF
+#-rw-r--r-- 1 root root      314 Jan  4 00:33 RAF
 $ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush RAF
 Signing file RAF
 Write signature to RAF.sig
-$ tar zcf AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs RAF RAF.sig
+#-rw-r--r-- 1 root root      314 Jan  4 00:33 RAF
+#-rw-r--r-- 1 root root      298 Jan  4 00:35 RAF.sig
+$ tar zcf @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV RAF RAF.sig
+#-rw-r--r-- 1 root root      713 Jan  4 00:37 @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
 ```
-This RAF tar file could always be the same and be careful the size is 1KB max.
+Be careful the size is 1KB max.
 
-To send it to the new contact, you need to encrypt it using the receiver SSH public key and make the final filename your SSH public key:
-```
-$ age -R ./id_ed25519.pub identity.tgz > AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-```
 Sending the request:
 ```
-$ (echo put AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA ) | sftp -i ~/.ssh/id_sshush _@server1
+$ (echo put @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV @111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU ) | sftp -i ~/.ssh/id_sshush @@server1
 Connected to server1.
-sftp> put AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-Uploading AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs to /AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA/AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs                             100%  594   363.7KB/s   00:00
+sftp> put @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV @111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
+Uploading @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV to /@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU/@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
+@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV                                                                               100%  594    26.1KB/s   00:00
 ```
 if `server1` is offline, just use `server2`.
 
-You can't overwrite files:
-```
-$ (echo put AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA ) | sftp -i ~/.ssh/id_sshush _@server1
-Connected to server1.
-sftp> put AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-Uploading AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs to /AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA/AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-dest open("/AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA/AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs"): Permission denied
-```
-
 ## Validating Primary contact
 ```
-root@minipc1:~/age# cat > allowed_signers
-test2 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+$ tar zxf @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV' | cut -c 2- | base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo ssh-ed25519 $PUBKEY
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
 
-root@minipc1:~/age# rm test*
-root@minipc1:~/age# age -d -i ./id_ed25519 Hx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs | tar zxf -
-root@minipc1:~/age# ls -l
-total 44
--rw-r--r-- 1 root root 778 Dec  9 01:41 Hx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
--rw-r--r-- 1 root root  87 Dec  9 01:55 allowed_signers
--rw------- 1 root root 399 Dec  9 00:43 id_ed25519
--rw-r--r-- 1 root root  94 Dec  9 00:43 id_ed25519.pub
--rw------- 1 root root 399 Dec  9 00:45 id_ed25519_2
--rw-r--r-- 1 root root  94 Dec  9 00:45 id_ed25519_2.pub
--rw-r--r-- 1 root root 628 Dec  9 01:23 test.txt
--rw-r--r-- 1 root root 294 Dec  9 01:31 test.txt.sig
+cat > RAF_signers
+RAF ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 
-root@minipc1:~/age# fgrep Hx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs allowed_signers
-test2 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-
-root@minipc1:~/age# ssh-keygen -Y verify -f allowed_signers -I test2 -n mage -s test.txt.sig < test.txt
-Good "mage" signature for test2 with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
+$ ssh-keygen -Y verify -f RAF_signers -I RAF -n sshush -s RAF.sig < RAF
+Good "sshush" signature for RAF with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
+```
+Signature is correct.
+```
+$ age -d -f 
 ```
 # Server configuration
 Two mecanisms:
