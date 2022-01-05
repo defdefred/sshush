@@ -12,7 +12,7 @@ SPAM must be eradicated.
 
 Should be easily home hosted or shoudn't need excessive trust to the hosting server.
 
-# Address
+# SSHush Address
 1 user = 1 public ssh-key and one or many server where you can receive mail.
 
 Two servers are enought for most of people to be always online.
@@ -27,19 +27,19 @@ Proposal for SSHush email presentation:
 <John Doe>@111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU[server1,server2:2222]
 <Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[W.X.Y.Z:4444,server4]
 ```
-The sshush-key is a base58 representation of the ssh-key with `@` prefix for filename and username compatibility.
+The sshush-key is a base58 representation of the ssh-key with `@` prefix for filename and username compatibility (and fun).
 ```
 $ echo -n @ ; echo AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA | base64 -d | base58
 @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
 $ echo -n @ ; echo AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs | base64 -d | base58
 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 ```
-The protocol part of the ssh-key is kept for future compatibily with future key type.
+The protocol part of the ssh-key is kept for future compatibily with future key type (quantum proof).
 ```
 $ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | base64 -d
 ssh-ed25519
 ```
-QRcode are welcome!
+QRcode are welcome to exchange email address!
 
 # Server side operation
 Two mecanisms:
@@ -80,10 +80,10 @@ date -u '+%s'
 1641250383.jpg
 ```
 
-## Contact management
+## Anonymous contact management
 
 The server need to manager the receiver `authorized_keys` with all validated public ssh-key of senders.
-The server is regulary building the `authorized_keys` using a `allowed_signers` anonymous standard ssh file.
+The server is regulary building the `authorized_keys` using a `allowed_signers` anonymous standard ssh file managed by the receiver.
 ```
 cat > allowed_signers
 @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
@@ -91,8 +91,8 @@ cat > allowed_signers
 ```
 
 # Client side operation
-`
-## Asking for Primary contact
+
+## Sender asking for Primary contact
 
 You need to create a `RAF` file with private information only for the receiver (ex: your real name):
 ```
@@ -118,7 +118,7 @@ Uploading @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV 
 ```
 if `server1` is offline, just use `server2`.
 
-## Validating Primary contact
+## Receiver validating primary contact
 ```
 $ tar zxf @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV' | cut -c 2- | base58 -d | base64)
@@ -133,8 +133,22 @@ Good "sshush" signature for RAF with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIH
 ```
 Signature is correct.
 ```
-$ age -d -f 
+$ age -d -f ./id_ed25519_john RAF > RAF.txt
+$ cat RAF.txt
+<Jane Doe>@111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV[W.X.Y.Z:4444,server4]
 ```
+Ok I know Jane, she is a friend, I will accept email from her:
+```
+echo @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs >> allowed_signers
+```
+Update all my sshush server with my new `allowed_signers` file:
+```
+$ for i in server1 server2
+do
+  (echo put allowed_signers  ) | sftp -i ./id_ed25519_john @111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@$i
+done
+```
+
 # Server configuration
 Two mecanisms:
 - Primary contact
