@@ -54,6 +54,7 @@ Every server is accepting sftp connexion with a dedicated user, named `@`, using
 
 Request for agreement is uploaded to a dedicated folder (the receiver sshush-key). You need to know the receiver email, folders are not browsable.
 
+[tar gzip ou pas?]
 The filename of the request for agreement is the requester sshush-key and the max file size is 1KB. The content is a tar file with:
 - "RFA": the request for agreement which is utf-8 text encryted with the receiver public ssh-key using the `age` or `rage` tool for privacy.
 - "RFA.sig": the signing of the request for agreement with the requester private ssh-key. 
@@ -68,6 +69,7 @@ The server is regulary checking the folders to:
 
 When the request for agreement is validated by the receiver, your public ssh-key is configured on all server used by the receiver and your can connect with sftp using the receiver sshush key as login name. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
 
+[tar gzip ou pas?]
 You are only authorized to upload files to a dedicated folder. The file format is again a tar file with encrytion and signature but without the 1KB limitation. Filenames must be different, because you can't overwrite files. A timestap could help.
 
 The encrypted file content is the real message and the format is TBD. Maybe pure text with url detection and pure data with file extension is enougth.
@@ -89,6 +91,7 @@ cat > allowed_signers
 @111RN3t1cWCcecTLM26gmqhchjRURTAu5E4U6HGDXURNL51LuvXEy9PDb1nxMNuy4wKV ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 ^D
 ```
+
 
 # Client side operation
 
