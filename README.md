@@ -118,9 +118,9 @@ cat > allowed_signers
 
 ## Sender asking for Primary contact
 
-You need to create a `RAF` file with private information only for the receiver (ex: your real name and full sshush email address):
+You need to create 2 files with private information only for the receiver (ex: your real name and full sshush email address):
 ```
-$ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[W.X.Y.Z:4444,server4]" | age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+$ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]" | age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 #-rw-r--r-- 1 root root      314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 $ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Signing file @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
@@ -132,7 +132,7 @@ Be careful the size is 1KB max.
 
 Sending the request:
 ```
-$ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm; echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) | sftp -i ~/.ssh/id_sshush @@server1
+$ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm; echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) | sftp -i ~/.ssh/id_sshush @server1
 Connected to localhost.
 sftp> put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
@@ -142,6 +142,29 @@ Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.
 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig                                                                           100%  298   210.4KB/s   00:00
 ```
 if `server1` is offline, just use `server2`.
+
+Don't forget to accept response from the receiver! You already know him and found his sshush email somewhere...
+```
+echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
+@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+```
+Update all your sshush servers with your new `allowed_signers` file:
+```
+$ for i in server3 server4
+do
+  (echo put allowed_signers  ) | sftp -i ./id_ed25519_jane @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i
+done
+Connected to server3.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+Connected to server4.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+```
 
 ## Receiver validating primary contact
 ```
@@ -167,7 +190,26 @@ $ for i in server1 server2
 do
   (echo put allowed_signers  ) | sftp -i ./id_ed25519_john @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm@$i
 done
+Connected to server1.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+Connected to server2.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
 ```
+Let's inform the requester 
+```
+$ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > Welcome.txt
+$ ssh-keygen -Y sign -n sshush -f id_ed25519_john Welcome.txt
+Signing file Welcome.txt
+Write signature to Welcome.txt.sig
+$ ( echo put Welcome.txt ; echo put Welcome.txt.sig ) | sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
+```
+## Sender allowing the receiver to respond
+
+## Receiver to respond to the sender
 
 # Server configuration
 Two mecanisms:
@@ -247,6 +289,31 @@ root@minipc1:/chroot# ln -s -- _111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTs
 root@minipc1:/chroot# cat /root/age/id_ed25519.pub > -111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU_authorized_keys
 `vi /etc/passwd` and `vi /etc/shadow` to change `__` by `-111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU`
 ```
+
+## create user jane
+ 737  /sbin/useradd --badnames -d /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -g sshush -s /usr/sbin/nologin _
+  738  vi /etc/passwd
+  739  vi /etc/shadow
+  740  cat /chroot/\@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+  741  cat > /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
+  742  mkdir /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+  743  touch /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/allowed_signers
+  744  chown @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym:sshush /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/allowed_signers
+  745  mkdir /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+  746  chmod 777 /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+
+
+root@minipc1:~/age# cat /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
+command="internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+
+## create user john
+
+root@minipc1:~/age# cat /chroot/\@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+command="internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+
+
 # Links
 http://www.openssh.com/
 https://github.com/FiloSottile/age
