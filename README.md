@@ -206,6 +206,14 @@ $ ssh-keygen -Y sign -n sshush -f id_ed25519_john Welcome.txt
 Signing file Welcome.txt
 Write signature to Welcome.txt.sig
 $ ( echo put Welcome.txt ; echo put Welcome.txt.sig ) | sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
+Connected to server3.
+sftp> put Welcome.txt
+Uploading Welcome.txt to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt
+Welcome.txt                                                                                                                                         100%  261    20.8KB/s   00:00
+sftp> put Welcome.txt.sig
+Uploading Welcome.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
+Welcome.txt.sig                                                                                                                                     100%  298   227.1KB/s   00:00
+
 ```
 ## Sender allowing the receiver to respond
 
