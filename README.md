@@ -62,8 +62,36 @@ The protocol part of the ssh-key is kept for future compatibily with future key 
 $ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | base64 -d
 ssh-ed25519
 ```
-QRcode are welcome to exchange email address!
-
+The idea behind SSHush is that your sshush-key email address is also a username to connect to the server using the secure sftp protocol.
+So `<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]` will be able to do:
+```
+$ sftp -i id_ed25519_jane.pub @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
+$ sftp -i id_ed25519_jane.pub @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server4
+```
+# Accepting contact
+Now imagin that Jane wants to send an email to John. She found his sshush email easily on his blog and the first step is to allow John to send email to her.
+```
+$ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
+@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+```
+Update all your sshush servers with your new `allowed_signers` file:
+```
+$ for i in server3 server4
+do
+  (echo put allowed_signers  ) | sftp -i ./id_ed25519_jane @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i
+done
+Connected to server3.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+Connected to server4.
+sftp> put allowed_signers
+Uploading allowed_signers to /allowed_signers
+allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+```
+That's all, now John can upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
 # Server side operation
 Two mecanisms:
 - Primary contact
@@ -144,27 +172,7 @@ Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.
 if `server1` is offline, just use `server2`.
 
 Don't forget to accept response from the receiver! You already know him and found his sshush email somewhere...
-```
-echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
-$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
-```
-Update all your sshush servers with your new `allowed_signers` file:
-```
-$ for i in server3 server4
-do
-  (echo put allowed_signers  ) | sftp -i ./id_ed25519_jane @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i
-done
-Connected to server3.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
-Connected to server4.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
-```
+
 
 ## Receiver validating primary contact
 ```
@@ -323,7 +331,7 @@ command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf
 
 
 # Links
-http://www.openssh.com/
+https://www.openssh.com/
 https://github.com/FiloSottile/age
 
 
