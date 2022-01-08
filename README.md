@@ -45,7 +45,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 cat id_ed25519_jane.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_jane)
 ```
-Dedicated ssh-key for SSHush minimal access to server when asking for contact aggrement:
+Dedicated ssh-key for SSHush minimal access to server when asking for contact agreement:
 ```
 $ cat id_sshush
 -----BEGIN OPENSSH PRIVATE KEY-----
@@ -92,8 +92,10 @@ The `allowed_signers` file is an openssh standard file to allow signature verifi
 $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
 $ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY >> allowed_signers
+$ fold -s allowed_signers
+@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
 The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrateur to update the `authorized_keys` file related to Jane's sshush-key user.
 ```
