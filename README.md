@@ -45,6 +45,19 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 cat id_ed25519_jane.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_jane)
 ```
+Dedicated ssh-key for SSHush minimal access to server when asking for contact aggrement:
+```
+$ cat id_sshush
+-----BEGIN OPENSSH PRIVATE KEY-----
+b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
+QyNTUxOQAAACC8q8l354zGaHMyyMsHLbBGTyzH+9AcEy5sRkDxOXCOwAAAAJBv1wBOb9cA
+TgAAAAtzc2gtZWQyNTUxOQAAACC8q8l354zGaHMyyMsHLbBGTyzH+9AcEy5sRkDxOXCOwA
+AAAEDRZmZyP3OmytYLo5MRPcvfFOjRoSr+rhpI3LOjmwOOQLyryXfnjMZoczLIywctsEZP
+LMf70BwTLmxGQPE5cI7AAAAADHJvb3RAbWluaXBjMQE=
+-----END OPENSSH PRIVATE KEY-----
+$ cat id_sshush.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A @everywhere
+```
 Proposal for SSHush email presentation:
 ```
 <John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2:2222]
