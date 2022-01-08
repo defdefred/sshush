@@ -76,20 +76,26 @@ $ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | base64 -d
 ssh-ed25519
 ```
 The idea behind SSHush is that your sshush-key email address is also a username to connect to the server using the secure sftp protocol.
-So `<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]` will be able to do:
+So `<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]` will be able to retreive email doing:
 ```
 $ sftp -i id_ed25519_jane.pub @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
 $ sftp -i id_ed25519_jane.pub @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server4
 ```
 # Accepting contact
+## Client side operations
 Now imagin that Jane wants to send an email to John. She found his sshush email easily on his blog and the first step is to allow John to send email to her.
+
+The `contact` file is usefull to know the sshush-key email of John Doe and the servers he used.
+
+The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
 ```
 $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
+echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY | tee -a allowed_signers
 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
-Update all your sshush servers with your new `allowed_signers` file:
+The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrateur to update the `authorized_keys` file related to Jane's sshush-key user.
 ```
 $ for i in server3 server4
 do
@@ -104,7 +110,30 @@ sftp> put allowed_signers
 Uploading allowed_signers to /allowed_signers
 allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
 ```
-That's all, now John can upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
+That's all, in few  minutes, John will be able to upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
+## Server side operations
+What's going on in `server3` or `server4` with the new `allowed_signers` file for Jane? Simply rebuild her `authorized_keys` file with the updated data. Maybe some new contact added and maybe some useless one deleted...
+
+Mandatory limited access for Jane:
+```
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- | base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
+echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" ssh-ed25519 $PUBKEY" \
+> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+```
+Ultra-limited access for Jane authorized contact:
+```
+$ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
+do
+   echo "command=\"internal-sftp -d /$SSHUSHKEY -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775\" $KEYTYPE $SSHPUBKEY" \
+   >> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+done
+   
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
+echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY \
+> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+```
+John is not allowed to upload email to Jane folder.
 # Server side operation
 Two mecanisms:
 - Primary contact
