@@ -90,7 +90,8 @@ The `contact` file is usefull to know the sshush-key email of John Doe and the s
 The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
 ```
 $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
-$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- | base58 -d | base64)
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- \
+| base58 -d | base64)
 $ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
 echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY >> allowed_signers
 $ fold -s allowed_signers
@@ -119,7 +120,8 @@ What's going on in `server3` or `server4` with the new `allowed_signers` file fo
 
 Mandatory limited access for Jane:
 ```
-$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- | base58 -d | base64)
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- \
+| base58 -d | base64)
 $ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
 echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" ssh-ed25519 $PUBKEY" \
 > @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
@@ -128,8 +130,8 @@ Ultra-limited access for Jane authorized contact:
 ```
 $ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
 do
-   echo "command=\"internal-sftp -d /$SSHUSHKEY -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775\" $KEYTYPE $SSHPUBKEY" \
-   >> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+   echo "command=\"internal-sftp -d /$SSHUSHKEY -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775\" \
+   $KEYTYPE $SSHPUBKEY" >> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
 done
    
 $ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
@@ -138,13 +140,14 @@ echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-e
 ```
 John is now allowed to upload email to Jane folder.
 
-# Client side operation
+# Primary contact
 
-## Sender asking for Primary contact
+## Client side operation
 
-You need to create 2 files with private information only for the receiver (ex: your real name and full sshush email address):
+Jane is now ready to ask John for a primary contact agreement. She need to create 2 files with private information only accessible to John (ex: your real name and full sshush email address, encrypted with the `age` tool and John public ssh-key):
 ```
-$ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]" | age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+$ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]" \
+| age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 #-rw-r--r-- 1 root root      314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 $ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Signing file @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
@@ -152,31 +155,61 @@ Write signature to @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768R
 #-rw-r--r-- 1 root root      314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 #-rw-r--r-- 1 root root      298 Jan  4 00:35 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
 ```
-Be careful the size is 1KB max.
+Be careful the size is 1KB max per file depending on server side configuration.
 
-Sending the request:
+Sending the request to any server used by John, using the user `@` and the sshush (not) private ssh-key:
 ```
-$ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm; echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) | sftp -i ~/.ssh/id_sshush @server1
-Connected to localhost.
+$ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) \
+| sftp -i ~/.ssh/id_sshush @@server1
+Connected to server1.
 sftp> put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym                                                                               100%  314   186.5KB/s   00:00
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym                                   100%  314   186.5KB/s   00:00
 sftp> put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig                                                                           100%  298   210.4KB/s   00:00
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig                               100%  298   210.4KB/s   00:00
 ```
 if `server1` is offline, just use `server2`.
 
-Don't forget to accept response from the receiver! You already know him and found his sshush email somewhere...
+## Server side operations
 
-
-## Receiver validating primary contact
+To fight spamming, the server is able to validate the request for agreement ssh signature, but not to break the metadata privacy.
 ```
-$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym ssh-ed25519 $PUBKEY | tee RAF_signers
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- \
+| base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
+echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym ssh-ed25519 $PUBKEY > RAF_signers
+$ fold -s RAF_signers
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 
-$ ssh-keygen -Y verify -f RAF_signers -I @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -n sshush -s @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig < @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+$ ssh-keygen -Y verify -f RAF_signers -I @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+-n sshush -s @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig \
+< @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
+```
+Signature is correct.
+```
+$mv 
+```
+Move to John folder
+
+## Client side operaions
+John is finding the new request
+```
+$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2-\
+| base58 -d | base64)
+$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
+echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+ssh-ed25519 $PUBKEY > RAF_signers
+$ fold -s RAF_signers
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+
+$ ssh-keygen -Y verify -f RAF_signers -I @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+-n sshush -s @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig \
+< @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
 ```
 Signature is correct.
@@ -203,7 +236,7 @@ sftp> put allowed_signers
 Uploading allowed_signers to /allowed_signers
 allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
 ```
-Let's inform the requester 
+Let's inform Jane
 ```
 $ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > Welcome.txt
 $ ssh-keygen -Y sign -n sshush -f id_ed25519_john Welcome.txt
@@ -217,33 +250,7 @@ Welcome.txt                                                                     
 sftp> put Welcome.txt.sig
 Uploading Welcome.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
 Welcome.txt.sig                                                                                                                                     100%  298   227.1KB/s   00:00
-
 ```
-## Sender allowing the receiver to respond
-
-## Receiver to respond to the sender
-# Server side operation
-Two mecanisms:
-- Primary contact
-- Regular contact
-
-## Primary contact
- 
-If you are not known by the receiver, you need to ask for agreement before sending the first email. Agreement is easily revocable. Yes, SPAM is dead.
-
-Every server is accepting sftp connexion with a dedicated user, named `@`, using a ssh-key known by everybody. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
-
-Request for agreement is uploaded to a dedicated folder (the receiver sshush-key). You need to know the receiver email, folders are not browsable.
-
-The filename of the request for agreement is the requester sshush-key and the max file size is 1KB. 2 files are mandatory:
-- "sshush-key.txt": the request for agreement which is utf-8 text encryted with the receiver public ssh-key using the `age` or `rage` tool for privacy.
-- "sshush-key.sig": the signing of the request for agreement with the requester private ssh-key using ssh-keygen.
-
-The server is capable to make signature validation, but not to access the `sshush-key.txt` content, nor to assure you that the identity is real. You need to ensure by yourself, who is asking for agreement!
-
-The server is regulary checking the folders to:
-- validating/transmetting the request to the dedicated folder in the receiver storage.
-- suppress false request with bad signature.
 
 ## Regular contact
 
@@ -261,15 +268,7 @@ date -u '+%s'
 1641250383.jpg
 ```
 
-## Anonymous contact management
 
-The server need to manager the receiver `authorized_keys` with all validated public ssh-key of senders.
-The server is regulary building the `authorized_keys` using a `allowed_signers` anonymous standard ssh file managed by the receiver.
-```
-cat > allowed_signers
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-^D
-```
 
 
 # Server configuration
