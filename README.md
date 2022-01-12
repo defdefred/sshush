@@ -8,6 +8,8 @@ You can't send binary data with SMTP, so all is bloated.
 
 Metadata are accessible to all.
 
+You can't always keep the same name when changing domain.
+
 SPAM must be eradicated.
 
 Should be easily home hosted or shoudn't need excessive trust to the hosting server.
@@ -16,6 +18,8 @@ Should be easily home hosted or shoudn't need excessive trust to the hosting ser
 1 user = 1 public ssh-key and one or many server where you can receive mail.
 
 Two servers are enought for most of people to be always online.
+
+Your ssh-key is uniq to you.
 
 Example of ed25519 public ssh-keys:
 ```
@@ -85,11 +89,12 @@ $ sftp -i id_ed25519_jane.pub @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juug
 ## Client side operations
 Now imagin that Jane wants to send an email to John. She found his sshush email easily on his blog and the first step is to allow John to send email to her.
 
-The `contact` file is usefull to know the sshush-key email of John Doe and the servers he used.
-
-The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
+The `contact` file is usefull to know the sshush-key email of John Doe and the servers he use.
 ```
 $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
+```
+The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
+```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- \
 | base58 -d | base64)
 $ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
