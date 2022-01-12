@@ -103,7 +103,7 @@ $ fold -s allowed_signers
 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
-The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrateur to update the `authorized_keys` file related to Jane's sshush-key user.
+The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrator to update the `authorized_keys` file related to Jane's sshush-key user.
 ```
 $ for i in server3 server4
 do
@@ -120,6 +120,7 @@ Uploading allowed_signers to /allowed_signers
 allowed_signers                                                                        100%   88    51.3KB/s   00:00
 ```
 That's all, in few  minutes, John will be able to upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
+
 ## Server side operations
 What's going on in `server3` or `server4` with the new `allowed_signers` file for Jane? Simply rebuild her `authorized_keys` file with the updated data. Maybe some new contact added and maybe some useless one deleted...
 
@@ -127,8 +128,9 @@ Mandatory limited access for Jane:
 ```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- \
 | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" ssh-ed25519 $PUBKEY" \
+$ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
+
+$ echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" $KEYTYPE $PUBKEY" \
 > @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
 ```
 Ultra-limited access for Jane authorized contact:
@@ -138,10 +140,6 @@ do
    echo "command=\"internal-sftp -d /$SSHUSHKEY -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775\" \
    $KEYTYPE $SSHPUBKEY" >> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
 done
-   
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY \
-> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
 ```
 John is now allowed to upload email to Jane folder.
 
@@ -149,20 +147,25 @@ John is now allowed to upload email to Jane folder.
 
 ## Client side operation
 
-Jane is now ready to ask John for a primary contact agreement. She need to create 2 files with private information only accessible to John (ex: your real name and full sshush email address, encrypted with the `age` tool and John public ssh-key):
+Jane is now ready to ask John for a primary contact agreement. She need to create 2 files with private information only accessible to John (ex: your real name and full sshush email address, encrypted with the `age` tool and John public ssh-key).
+
+The filename is Janne sshush-key:
 ```
 $ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]" \
 | age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-#-rw-r--r-- 1 root root      314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-$ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+#-rw-r--r-- 1 root root  314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+$ ssh-keygen -Y sign -f ./id_ed25519_jane -n sshush \
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Signing file @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Write signature to @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
-#-rw-r--r-- 1 root root      314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-#-rw-r--r-- 1 root root      298 Jan  4 00:35 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
+#-rw-r--r-- 1 root root  314 Jan  4 00:33 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+#-rw-r--r-- 1 root root  298 Jan  4 00:35 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
 ```
 Be careful the size is 1KB max per file depending on server side configuration.
 
-Sending the request to any server used by John, using the user `@` and the sshush (not) private ssh-key:
+Sending the request to any server used by John, using the user `@` and the sshush (not) private ssh-key.
+
+The destination folder is the John sshush-key:
 ```
 $ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) \
@@ -183,8 +186,8 @@ To fight spamming, the server is able to validate the request for agreement ssh 
 ```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- \
 | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym ssh-ed25519 $PUBKEY > RAF_signers
+$ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
+$ echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym $KEYTYPE $PUBKEY > RAF_signers
 $ fold -s RAF_signers
 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
@@ -194,20 +197,21 @@ $ ssh-keygen -Y verify -f RAF_signers -I @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1
 < @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
 ```
-Signature is correct.
+Signature is correct. Move the request to John folder:
 ```
-$mv 
+$ mv @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vymv @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig \
+/chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/requests/
 ```
-Move to John folder
+
 
 ## Client side operaions
-John is finding the new request
+John is finding the new request when pooling his server for new email. He re-check the signature because he is not trusting the server.
 ```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2-\
 | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
-ssh-ed25519 $PUBKEY > RAF_signers
+$ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
+$ echo @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+$KEYTYPE $PUBKEY > RAF_signers
 $ fold -s RAF_signers
 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
 ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
@@ -220,7 +224,7 @@ Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbv
 Signature is correct.
 ```
 $ age -d -i ./id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[W.X.Y.Z:4444,server4]
+<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]
 ```
 Ok I know Jane, she is a friend, I will accept email from her:
 ```
@@ -241,41 +245,25 @@ sftp> put allowed_signers
 Uploading allowed_signers to /allowed_signers
 allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
 ```
-Let's inform Jane
-```
-$ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > Welcome.txt
-$ ssh-keygen -Y sign -n sshush -f id_ed25519_john Welcome.txt
-Signing file Welcome.txt
-Write signature to Welcome.txt.sig
-$ ( echo put Welcome.txt ; echo put Welcome.txt.sig ) | sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
-Connected to server3.
-sftp> put Welcome.txt
-Uploading Welcome.txt to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt
-Welcome.txt                                                                                                                                         100%  261    20.8KB/s   00:00
-sftp> put Welcome.txt.sig
-Uploading Welcome.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
-Welcome.txt.sig                                                                                                                                     100%  298   227.1KB/s   00:00
-```
-
 ## Regular contact
 
-When the request for agreement is validated by the receiver, the requester public ssh-key is configured on all server used by the receiver and he can connect with sftp using the receiver sshush key as login name. Allowed commands are a dramaticaly limited subset of sftp working in a chrooted folder.
-
-You are only authorized to upload files to a dedicated folder. The file format is again a tar file with encrytion and signature but without the 1KB limitation. Filenames must be different, because you can't overwrite files. A timestap could help.
-
-The encrypted file content is the real message and the format is TBD. Maybe pure text with url detection and pure data with file extension is enougth.
-Example:
+Let's inform Jane with a regular email. Using date from epoch is a practical way to avoid duplicate filename:
 ```
 date -u '+%s'
 1641250382
-
-1641250382.txt = "Hello John, look at this"
-1641250383.jpg
+$ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > 1641250382.txt
+$ ssh-keygen -Y sign -n sshush -f id_ed25519_john 1641250382.txt
+Signing file 1641250382.txt
+Write signature to 1641250382.txt.sig
+$ ( echo put 1641250382.txt ; echo put 1641250382.txt.sig ) | sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
+Connected to server3.
+sftp> put 1641250382.txt
+Uploading 1641250382.txt to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/1641250382.txt
+1641250382.txt                                                                          100%  261    20.8KB/s   00:00
+sftp> put 1641250382.txt.sig
+Uploading 1641250382.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
+1641250382.txt.sig                                                                      100%  298   227.1KB/s   00:00
 ```
-
-
-
-
 # Server configuration
 Two mecanisms:
 - Primary contact
@@ -285,20 +273,27 @@ Two mecanisms:
 
 SSHd configuration (chroot, sftp restriction and umask to prevent overwriting files):
 ```
-Match user _
-    AuthorizedKeysFile /chroot/authorized_keys
-    ChrootDirectory /chroot/_
-    ForceCommand internal-sftp -P readdir,remove,mkdir,rmdir -u 775 (need to be changed with -p only allowed command)
-    AllowTcpForwarding no
-    X11Forwarding no
+$ cat /etc/ssh/sshd_config.d/sshush.conf
+Match user @*
+    AuthorizedKeysFile /chroot/%u_authorized_keys
+    ChrootDirectory %h
+
 ```
 Folder creation for chrooted environnement:
 ```
 $ mkdir /chroot
-$ chmod 700 /chroot
-$ mkdir /chroot/_
-$ chown _._ /chroot/_
-$ chmod 500 /chroot/_
+$ chmod 755 /chroot
+$ mkdir /chroot/@
+$ chmod 755 /chroot/@
+root@minipc1:/chroot# ls -l
+total 24
+drwxr-xr-x 3 root                                                                  root   4096 Jan  6 00:22 @
+drwxr-xr-x 3 root                                                                  root   4096 Jan  6 02:13 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+-rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  383 Jan  6 02:11 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
+drwxr-xr-x 3 root                                                                  root   4096 Jan  6 00:57 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+-rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush  384 Jan  6 01:14 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
+-r--r--r-- 1 root                                                                  root    168 Jan  3 00:35 @_authorized_keys
+
 ```
 `_` user creation
 ```
