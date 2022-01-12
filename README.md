@@ -378,9 +378,15 @@ root@minipc1:~/age# cat /chroot/\@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9
 command="internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 
+# What Next?
+Maybe, the ancien tcp port 25 could be used...
+
+Manual Proof Of Concept is fine, but who will developpe a real client ?
+
 
 # Links
 https://www.openssh.com/
+
 https://github.com/FiloSottile/age
 
 
