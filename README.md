@@ -277,7 +277,6 @@ $ cat /etc/ssh/sshd_config.d/sshush.conf
 Match user @*
     AuthorizedKeysFile /chroot/%u_authorized_keys
     ChrootDirectory %h
-
 ```
 Folder creation for chrooted environnement:
 ```
@@ -285,53 +284,31 @@ $ mkdir /chroot
 $ chmod 755 /chroot
 $ mkdir /chroot/@
 $ chmod 755 /chroot/@
-root@minipc1:/chroot# ls -l
-total 24
-drwxr-xr-x 3 root                                                                  root   4096 Jan  6 00:22 @
+$ echo 'restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 775" ssh-ed25519 \
+AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A' > /chroot/@_authorized_keys
+$ chmod 644 /chroot/@_authorized_keys
+```
+`@` user creation
+```
+$ groupadd sshush
+$ useradd --badnames -d /chroot/@ -g sshush -s /usr/sbin/nologin @
+```
+`@` user can't write more than 1KB per files.
+```
+$ cat /etc/security/limits.d/@.conf
+@       hard    fsize   1
+```
+Folder creation for email address
+```
+```
+## Regular contact
+```
 drwxr-xr-x 3 root                                                                  root   4096 Jan  6 02:13 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 -rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  383 Jan  6 02:11 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
 drwxr-xr-x 3 root                                                                  root   4096 Jan  6 00:57 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 -rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush  384 Jan  6 01:14 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
--r--r--r-- 1 root                                                                  root    168 Jan  3 00:35 @_authorized_keys
 
-```
-`_` user creation
-```
-$ useradd -d /_ -s /bin/false -U _
-$ passwd _
-$ cp well_known_ssh_key.pub /chroot/authorized_keys
-$ chmod 444 /chroot/authorized_keys
-```
-`_` user can't write more than 1KB per files.
-(maybe more limit need to be set, and fail2ban configured)
-```
-$ cat /etc/security/limits.d/_.conf
-_       hard    fsize   1
-```
-Folder creation for email address
-```
-$ mkdir /chroot/_/AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-$ chown _._ /chroot/_/AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-$ chmod 700 /chroot/_/AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-$ ls -lR /chroot/
-/chroot/:
-total 8
-drwxr-xr-x 3 root root 4096 Dec 17 00:11 _
--r--r--r-- 1 _    _      94 Dec 16 23:55 authorized_keys
 
-/chroot/_:
-total 4
-drwx------ 2 _ _ 4096 Dec 17 00:35 AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA
-
-/chroot/_/AAAAC3NzaC1lZDI1NTE5AAAAILNNuqT+MXwIyGXopB0Fj6TBXtpqUe8PnyafFqPLK8aA:
-total 16
----------- 1 _ _  594 Dec 17 00:29 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-```
-## Regular contact
-```
-root@minipc1:/etc# getconf LOGIN_NAME_MAX
-256
-groupadd sshush
 root@minipc1:/chroot# /sbin/useradd --badnames -d /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU -g sshush -s /bin/false __
 root@minipc1:/chroot# mkdir /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
 root@minipc1:/chroot# cat /root/age/id_ed25519_2.pub > /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU_authorized_keys
