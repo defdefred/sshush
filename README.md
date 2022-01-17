@@ -19,7 +19,7 @@ Should be easily home hosted or shoudn't need excessive trust to the hosting ser
 
 Two servers are enought for most of people to be always online.
 
-Your ssh-key is uniq to you.
+Your ssh-key is uniq to you and you are creating it by youself.
 
 Example of ed25519 public ssh-keys:
 ```
@@ -76,7 +76,7 @@ $ echo -n @ ; echo AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglry
 ```
 The protocol part of the ssh-key is kept for future compatibily with future key type (quantum proof).
 ```
-$ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | base64 -d
+$ echo "AAAAC3NzaC1lZDI1NTE5AAAA" | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9]
 ssh-ed25519
 ```
 The idea behind SSHush is that your sshush-key email address is also a username to connect to the server using the secure sftp protocol.
@@ -97,8 +97,10 @@ The `allowed_signers` file is an openssh standard file to allow signature verifi
 ```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- \
 | base58 -d | base64)
-$ echo $PUBKEY | egrep -q '^AAAAC3NzaC1lZDI1NTE5AAAA' && \
-echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ssh-ed25519 $PUBKEY >> allowed_signers
+
+$ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
+echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm $KEYTYPE $PUBKEY >> allowed_signers
+
 $ fold -s allowed_signers
 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
@@ -128,6 +130,7 @@ Mandatory limited access for Jane:
 ```
 $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym' | cut -c 2- \
 | base58 -d | base64)
+
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
 $ echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" $KEYTYPE $PUBKEY" \
@@ -149,7 +152,7 @@ John is now allowed to upload email to Jane folder.
 
 Jane is now ready to ask John for a primary contact agreement. She need to create 2 files with private information only accessible to John (ex: your real name and full sshush email address, encrypted with the `age` tool and John public ssh-key).
 
-The filename is Janne sshush-key:
+The filename is Jane sshush-key:
 ```
 $ echo "<Jane Doe>@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym[server3,server4]" \
 | age -R ./id_ed25519_john.pub > @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
