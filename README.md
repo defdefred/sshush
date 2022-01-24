@@ -109,17 +109,10 @@ The updated `allowed_signers` file must be transfered to all sshush servers used
 ```
 $ for i in server3 server4
 do
-  (echo put allowed_signers  ) | sftp -i ./id_ed25519_jane \
-  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i
+  sftp -qi ./id_ed25519_jane @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i << EOT
+@put allowed_signers
+EOT
 done
-Connected to server3.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                        100%   88    51.3KB/s   00:00
-Connected to server4.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                        100%   88    51.3KB/s   00:00
 ```
 That's all, in few  minutes, John will be able to upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
 
