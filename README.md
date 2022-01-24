@@ -133,14 +133,14 @@ $ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6
 
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
-$ echo "command=\"internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775\" $KEYTYPE $PUBKEY" \
+$ echo "command=\"internal-sftp -p open,close,write,opendir,realpath,stat -u 775\" $KEYTYPE $PUBKEY" \
 > /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
 ```
 Ultra-limited access for Jane authorized contact:
 ```
 $ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
 do
-   echo "command=\"internal-sftp -d /$SSHUSHKEY -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775\" \
+   echo "command=\"internal-sftp -d /$SSHUSHKEY -p open,close,write,realpath,stat -u 775\" \
    $KEYTYPE $SSHPUBKEY" >> /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
 done
 ```
@@ -247,11 +247,11 @@ done
 Connected to server1.
 sftp> put allowed_signers
 Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+allowed_signers                                                                                             100%   88    51.3KB/s   00:00
 Connected to server2.
 sftp> put allowed_signers
 Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                                                                     100%   88    51.3KB/s   00:00
+allowed_signers                                                                                             100%   88    51.3KB/s   00:00
 ```
 ## Regular contact
 
@@ -259,7 +259,8 @@ Let's inform Jane with a regular email. Using date from epoch is a practical way
 ```
 date -u '+%s'
 1641250382
-$ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > 1641250382.txt
+$ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep \
+@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym allowed_signers | cut -d ' ' -f 2- )" > 1641250382.txt
 $ ssh-keygen -Y sign -n sshush -f id_ed25519_john 1641250382.txt
 Signing file 1641250382.txt
 Write signature to 1641250382.txt.sig
@@ -267,10 +268,10 @@ $ ( echo put 1641250382.txt ; echo put 1641250382.txt.sig ) | sftp -i id_ed25519
 Connected to server3.
 sftp> put 1641250382.txt
 Uploading 1641250382.txt to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/1641250382.txt
-1641250382.txt                                                                          100%  261    20.8KB/s   00:00
+1641250382.txt                                                                                             100%  261    20.8KB/s   00:00
 sftp> put 1641250382.txt.sig
 Uploading 1641250382.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
-1641250382.txt.sig                                                                      100%  298   227.1KB/s   00:00
+1641250382.txt.sig                                                                                         100%  298   227.1KB/s   00:00
 ```
 # Server configuration
 Two mecanisms:
