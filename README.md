@@ -146,8 +146,11 @@ done
 ```
 A dedicated folder is needed for each allowed sshush-key
 ```
-mkdir -p /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-chown @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym:sshush /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm 
+mkdir -p /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym\
+/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+chown @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym:sshush \
+/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym\
+/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm 
 ```
 John is now allowed to upload email to Jane folder.
 
@@ -175,16 +178,12 @@ Sending the request to any server used by John, using the user `@` and the sshus
 
 The destination folder is the John sshush-key:
 ```
-$ (echo put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-echo put  @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm ) \
-| sftp -i ~/.ssh/id_sshush @@server1
-Connected to server1.
-sftp> put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym                                   100%  314   186.5KB/s   00:00
-sftp> put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-Uploading @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig                               100%  298   210.4KB/s   00:00
+$ sftp -qi ~/.ssh/id_sshush @@server1 << EOT
+@put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym \
+> @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+@put @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig \
+> @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
+EOT
 ```
 if `server1` is offline, just use `server2`.
 
@@ -242,16 +241,10 @@ Update all my sshush server with my new `allowed_signers` file:
 ```
 $ for i in server1 server2
 do
-  (echo put allowed_signers  ) | sftp -i ./id_ed25519_john @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm@$i
+  sftp -i ./id_ed25519_john @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm@$i << EOT
+@put allowed_signers
+EOT
 done
-Connected to server1.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                             100%   88    51.3KB/s   00:00
-Connected to server2.
-sftp> put allowed_signers
-Uploading allowed_signers to /allowed_signers
-allowed_signers                                                                                             100%   88    51.3KB/s   00:00
 ```
 ## Regular contact
 
@@ -264,14 +257,10 @@ $ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep \
 $ ssh-keygen -Y sign -n sshush -f id_ed25519_john 1641250382.txt
 Signing file 1641250382.txt
 Write signature to 1641250382.txt.sig
-$ ( echo put 1641250382.txt ; echo put 1641250382.txt.sig ) | sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3
-Connected to server3.
-sftp> put 1641250382.txt
-Uploading 1641250382.txt to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/1641250382.txt
-1641250382.txt                                                                                             100%  261    20.8KB/s   00:00
-sftp> put 1641250382.txt.sig
-Uploading 1641250382.txt.sig to /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/Welcome.txt.sig
-1641250382.txt.sig                                                                                         100%  298   227.1KB/s   00:00
+$ sftp -i id_ed25519_john @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@server3 << EOT
+@put 1641250382.txt
+@put 1641250382.txt.sig
+EOT
 ```
 # Server configuration
 Two mecanisms:
@@ -309,6 +298,7 @@ $ cat /etc/security/limits.d/@.conf
 ```
 Folder creation for email address
 ```
+TODO
 ```
 ## Regular contact
 ```
