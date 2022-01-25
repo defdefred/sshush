@@ -127,14 +127,14 @@ $ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
 
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
-$ echo "command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove\" $KEYTYPE $PUBKEY" > \
+$ echo "restrict,command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove\" $KEYTYPE $PUBKEY" > \
 > /chroot/${JANEKEY}_authorized_keys
 ```
 Ultra-limited access for Jane authorized contact. A dedicated folder is needed for each allowed sshush-key.
 ```
 $ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
 do
-   echo "command=\"internal-sftp -d /$SSHUSHKEY -p open,close,write,realpath,stat -u 775\" \
+   echo "restrict,command=\"internal-sftp -d /$SSHUSHKEY -p open,close,write,realpath,stat -u 775\" \
 > $KEYTYPE $SSHPUBKEY" >> /chroot/${JANEKEY}_authorized_keys
    mkdir -p /chroot/$JANEKEY/$SSHUSHKEY
    chown $JANEKEY:sshush /chroot/$JANEKEY/$SSHUSHKEY 
