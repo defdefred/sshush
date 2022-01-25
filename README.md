@@ -97,11 +97,10 @@ $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVk
 ```
 The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
 ```
-$ PUBKEY=$(echo '@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm' | cut -c 2- \
-> | base58 -d | base64)
-
+$ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
+$ PUBKEY=$(echo $JOHNKEY | cut -c 2- | base58 -d | base64)
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
-echo @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm $KEYTYPE $PUBKEY >> allowed_signers
+echo $JOHNKEY $KEYTYPE $PUBKEY >> allowed_signers
 
 $ fold -s allowed_signers
 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
@@ -111,7 +110,7 @@ The updated `allowed_signers` file must be transfered to all sshush servers used
 ```
 $ for i in server3 server4
 do
-  sftp -qi ./id_ed25519_jane @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym@$i << EOT
+  sftp -qi ./id_ed25519_jane $JOHNKEY@$i << EOT
 @put allowed_signers
 EOT
 done
