@@ -21,7 +21,7 @@ You are creating your own sshush email address.
 
 Two servers are enought for most of people to be always online.
 
-Your ssh-key is uniq to you and you are creating it by youself.
+Your ssh-key is unique to you and you are creating it by youself.
 
 Example of ed25519 public ssh-keys:
 ```
