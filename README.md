@@ -108,9 +108,10 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
 The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrator to update the `authorized_keys` file related to Jane's sshush-key user.
 ```
+$ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ for i in server3 server4
 do
-  sftp -qi ./id_ed25519_jane $JOHNKEY@$i << EOT
+  sftp -qi ./id_ed25519_jane $JANEKEY@$i << EOT
 @put allowed_signers
 EOT
 done
@@ -124,7 +125,6 @@ Mandatory limited access for Jane:
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
-
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
 $ echo "restrict,command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove\" $KEYTYPE $PUBKEY" > \
