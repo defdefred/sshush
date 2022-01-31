@@ -255,24 +255,31 @@ Two mecanisms:
 - Primary contact
 - Regular contact
 
+## Sshush admin user
+```
+$ /sbin/useradd -d /chroot/ -g sshush -s /usr/sbin/nologin sshush
+```
+
 ## Primary contact
 
 SSHd configuration (chroot, sftp restriction and umask to prevent overwriting files):
 ```
 $ cat /etc/ssh/sshd_config.d/sshush.conf
 Match user @*
-    AuthorizedKeysFile /chroot/%u_authorized_keys
+    AuthorizedKeysFile /chroot/authorized_keys/%u
     ChrootDirectory %h
 ```
 Folder creation for chrooted environnement:
 ```
 $ mkdir /chroot
 $ chmod 755 /chroot
+$ mkdir /chroot/authorized_keys
+$ chmod 755 /chroot/authorized_keys
 $ mkdir /chroot/@
 $ chmod 755 /chroot/@
 $ echo 'restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 775" ssh-ed25519 \
-AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A' > /chroot/@_authorized_keys
-$ chmod 644 /chroot/@_authorized_keys
+AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A' > /chroot/authorized_keys/@
+$ chmod 644 /chroot/authorized_keys/@
 ```
 `@` user creation
 ```
