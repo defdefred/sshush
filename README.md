@@ -128,14 +128,14 @@ $ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
 $ echo "restrict,command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove\" $KEYTYPE $PUBKEY" > \
-> /chroot/${JANEKEY}_authorized_keys
+> /chroot/authorized_keys/${JANEKEY}
 ```
 Ultra-limited access for Jane authorized contact. A dedicated folder is needed for each allowed sshush-key.
 ```
 $ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
 do
    echo "restrict,command=\"internal-sftp -d /$SSHUSHKEY -p open,close,write,realpath,stat -u 775\" \
-> $KEYTYPE $SSHPUBKEY" >> /chroot/${JANEKEY}_authorized_keys
+> $KEYTYPE $SSHPUBKEY" >> /chroot/authorized_keys/$JANEKEY
    mkdir -p /chroot/$JANEKEY/$SSHUSHKEY
    chown $JANEKEY:sshush /chroot/$JANEKEY/$SSHUSHKEY 
 done
@@ -197,7 +197,17 @@ Signature is correct. Move the request to John folder:
 $ mv $JANEKEY ${JANEKEY}.sig /chroot/$JOHNKEY/requests/
 ```
 ## Client side operaions
-John is finding the new request when pooling his server for new email. He check the signature because he is not trusting the server.
+John is finding the new request when pooling his server for new request.
+```
+$ for i in server1 server2
+do
+  sftp -i ./id_ed25519_john @@$i << EOT
+@get *
+EOT
+done
+```
+
+He check the signature.
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
