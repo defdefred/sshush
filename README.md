@@ -261,10 +261,52 @@ EOT
 ```
 
 # Server configuration
-Two mecanisms:
-- Primary contact
-- Regular contact
 
+## Folders
+### First level
+```
+root@host1:/chroot# ls -la
+total 24
+drwxr-xr-x  6 root root 4096 Feb  5 23:59 .
+drwxr-xr-x 19 root root 4096 Dec 26 23:38 ..drwxr-x--- 4 root sshush 4096 Jan 31 23:52 @
+drwxr-x--- 4 root sshush 4096 Feb  5 23:59 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+drwxr-x--- 4 root sshush 4096 Feb  6 00:06 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+drwxr-x--- 2 root sshush 4096 Feb  6 01:02 authorized_keys
+```
+### `@` user folder
+```
+root@host1:/chroot/@# ls -la
+total 16
+drwxrw---- 4 root                                                                  root   4096 Jan 31 23:52 .
+drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  6 01:06 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb  6 00:41 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+```
+One folder per sshush user with owner (rwx) = the sshush user and group (rwx) = the sshush group.
+
+### sshush user folder
+```
+root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym# ls -la
+total 20
+drwxr-x--- 4 root                                                                  sshush 4096 Feb  5 23:59 .
+drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  5 23:59 @
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  6 22:39 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+-rw-r----- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  151 Jan 25 00:52 allowed_signers
+```
+```
+root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm# ls -la
+total 20
+drwxr-x--- 4 root                                                                  sshush 4096 Feb  6 00:06 .
+drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb  6 00:06 @
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Jan  6 01:23 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+-rw-r----- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush   88 Jan  6 01:24 allowed_signers
+```
+### ssh authorized_keys folder
+```
+
+```
 ## Sshush admin user
 ```
 $ /sbin/useradd -d /chroot/ -g sshush -s /usr/sbin/nologin sshush
