@@ -261,35 +261,35 @@ EOT
 ```
 
 # Server configuration
-
 ## Folders
 ### First level
 ```
-root@host1:/chroot# ls -la
+root@minipc1:/chroot# ls -la
 total 24
-drwxr-xr-x  6 root root 4096 Feb  5 23:59 .
-drwxr-xr-x 19 root root 4096 Dec 26 23:38 ..drwxr-x--- 4 root sshush 4096 Jan 31 23:52 @
-drwxr-x--- 4 root sshush 4096 Feb  5 23:59 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-drwxr-x--- 4 root sshush 4096 Feb  6 00:06 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-drwxr-x--- 2 root sshush 4096 Feb  6 01:02 authorized_keys
+drwxr-x---  6 root sshush 4096 Feb  5 23:59 .
+drwxr-xr-x 19 root root   4096 Dec 26 23:38 ..
+drwxr-x---  4 root sshush 4096 Jan 31 23:52 @
+drwxr-x---  4 root sshush 4096 Feb  5 23:59 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+drwxr-x---  4 root sshush 4096 Feb  6 00:06 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+drwxr-x---  2 root sshush 4096 Feb  6 01:02 authorized_keys
 ```
 ### `@` user folder
 ```
-root@host1:/chroot/@# ls -la
+root@minipc1:/chroot/@# ls -la
 total 16
-drwxrw---- 4 root                                                                  root   4096 Jan 31 23:52 .
-drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwxr-x--- 4 root                                                                  sshush 4096 Jan 31 23:52 .
+drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
 drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  6 01:06 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb  6 00:41 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 ```
 One folder per sshush user with owner (rwx) = the sshush user and group (rwx) = the sshush group.
 
-### sshush user folder
+### sshush users folder
 ```
 root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym# ls -la
 total 20
 drwxr-x--- 4 root                                                                  sshush 4096 Feb  5 23:59 .
-drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
 drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  5 23:59 @
 drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  6 22:39 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 -rw-r----- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  151 Jan 25 00:52 allowed_signers
@@ -298,15 +298,43 @@ drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3V
 root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm# ls -la
 total 20
 drwxr-x--- 4 root                                                                  sshush 4096 Feb  6 00:06 .
-drwxr-xr-x 6 root                                                                  root   4096 Feb  5 23:59 ..
+drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
 drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb  6 00:06 @
 drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Jan  6 01:23 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 -rw-r----- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush   88 Jan  6 01:24 allowed_signers
 ```
+Inside each sshuser folder, the `@` folder is a mount --bind:
+```
+root@minipc1:/chroot# mount --bind /chroot/@/SSHUSH-USER /chroot/SSHUSH-USER/@
+```
 ### ssh authorized_keys folder
+```
+root@minipc1:/chroot/authorized_keys# ls -la
+total 20
+drwxr-x--- 2 root                                                                  sshush 4096 Feb  6 01:02 .
+drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
+-r-------- 1 @                                                                     sshush  759 Feb  6 01:02 @
+-r-------- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  419 Feb  6 00:58 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+-r-------- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush  384 Jan  6 01:14 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
+```
+## Ssh authorized_keys files
+# `@` user
+```
+root@minipc1:/chroot/authorized_keys# cat @
+restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 777" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A
+```
+Only allowed to change directory to the target sshush user and to write a file asking for permission to send sshush mail.
+
+# for sshush users
+```
+root@minipc1:/chroot/authorized_keys# cat @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+restrict,command="internal-sftp -p open,close,write,opendir,readdir,realpath,stat,remove,setstat,read,lstat" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+restrict,command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm -p open,close,write,realpath,stat -u 777" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+```
 ```
 
 ```
+
 ## Sshush admin user
 ```
 $ /sbin/useradd -d /chroot/ -g sshush -s /usr/sbin/nologin sshush
