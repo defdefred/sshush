@@ -305,7 +305,9 @@ drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49J
 ```
 Inside each sshuser folder, the `@` folder is a mount --bind:
 ```
-root@minipc1:/chroot# mount --bind /chroot/@/SSHUSH-USER /chroot/SSHUSH-USER/@
+root@minipc1:/# tail -2 /etc/fstab
+/chroot/@/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@ none defaults,bind 0 0
+/chroot/@/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm /chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@ none defaults,bind 0 0
 ```
 ### ssh authorized_keys folder
 ```
