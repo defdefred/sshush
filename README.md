@@ -303,6 +303,9 @@ drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49J
 drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Jan  6 01:23 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 -rw-r----- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush   88 Jan  6 01:24 allowed_signers
 ```
+root@minipc1:/# SECRET=$(openssl rand 64|base58)
+root@minipc1:/# mkdir 
+
 Inside each sshuser folder, the `@` folder is a mount --bind:
 ```
 root@minipc1:/# tail -2 /etc/fstab
