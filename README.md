@@ -286,31 +286,30 @@ One folder per sshush user with owner (rwx) = the sshush user and group (rwx) = 
 
 ### sshush users folder
 ```
-root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym# ls -la
-total 20
-drwxr-x--- 4 root                                                                  sshush 4096 Feb  5 23:59 .
-drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
-drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  5 23:59 @
-drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb  6 22:39 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
--rw-r----- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  151 Jan 25 00:52 allowed_signers
+root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym# ls -l
+total 12
+drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb 24 23:47 ask-UVatAmQs9VTvYBJTfkGAZ1EKWqAZoJuqyHLRcjQ6JV6idfCuxUJeCXRmGT24uBRKWvxkgY2S62QSkBZiotQcnuv
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb 23 01:03 cfg-n9ohTb45UjUuQGKtoVXNTQUFcoBpVhivJ8LdgVt2h82yRtJospkPZRMrGjTumMy6L73Pr5GzzpWB2CnSdo9Ktfd
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush 4096 Feb 23 01:22 new
 ```
+Second example:
 ```
-root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm# ls -la
-total 20
-drwxr-x--- 4 root                                                                  sshush 4096 Feb  6 00:06 .
-drwxr-x--- 6 root                                                                  sshush 4096 Feb  5 23:59 ..
-drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb  6 00:06 @
-drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Jan  6 01:23 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
--rw-r----- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush   88 Jan  6 01:24 allowed_signers
+root@minipc1:/chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm# ls -l
+total 16
+drwxrwx--- 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb 11 00:34 ask-pWDu1A26qtDBN12ohpPEj9mULAPwUanGZcWaKZUYMix1sSrwwFk4uAmgDTpS2U6Axcs2K7EyBQuRUxjsZNjftjb
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb 24 23:36 cfg-3wjDAdWfg2RgWWvzMSaikv67ZCi2k1pNrnitdJvv2djZQ975zGBgJ52BJLpSGaNHqcmxU1u5oSTUme8m8ceSsMam
+drwx------ 2 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush 4096 Feb 24 23:36 new
 ```
+Random number for the `àsk-` and `cfg-` folder are generated using:
+``` 
 root@minipc1:/# SECRET=$(openssl rand 64|base58)
-root@minipc1:/# mkdir 
-
-Inside each sshuser folder, the `@` folder is a mount --bind:
+root@minipc1:/# mkdir xxx-$SECRET
+``` 
+Inside each sshush-user folder, the `ask-` folder is a mount --bind to the sshush-user freely accessible folder, while the `cfg-` folder is used to upload the allowed external sshush-user list.
 ```
-root@minipc1:/# tail -2 /etc/fstab
-/chroot/@/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@ none defaults,bind 0 0
-/chroot/@/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm /chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/@ none defaults,bind 0 0
+root@minipc1:~# tail -2 /etc/fstab
+/chroot/@/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/ask-UVatAmQs9VTvYBJTfkGAZ1EKWqAZoJuqyHLRcjQ6JV6idfCuxUJeCXRmGT24uBRKWvxkgY2S62QSkBZiotQcnuv none defaults,bind 0 0
+/chroot/@/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm /chroot/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm/ask-pWDu1A26qtDBN12ohpPEj9mULAPwUanGZcWaKZUYMix1sSrwwFk4uAmgDTpS2U6Axcs2K7EyBQuRUxjsZNjftjb none defaults,bind 0 0
 ```
 ### ssh authorized_keys folder
 ```
