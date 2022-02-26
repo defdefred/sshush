@@ -230,14 +230,14 @@ sftp> put allowed_signers cfg-3wjDAdWfg2RgWWvzMSaikv67ZCi2k1pNrnitdJvv2djZQ975zG
 sftp> exit
 ```
 ## Regular contact
-Let's inform Jane with a regular email. Using date from epoch is a practical way to avoid duplicate filename:
+Let's inform Jane with a sshush email. Using date from epoch is a practical way to avoid duplicate filename:
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
 
 $ MSG=$(date -u '+%s')-${JOHNKEY}.txt
 $ echo $MSG
-1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JW
+1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JW.txt
 $ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep $JANEKEY allowed_signers \
 > | cut -d ' ' -f 2- )" > $MSG
 $ ssh-keygen -Y sign -n sshush -f id_ed25519_john $MSG
