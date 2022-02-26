@@ -106,45 +106,50 @@ $ fold -s allowed_signers
 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
-The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrator to update the `authorized_keys` file related to Jane's sshush-key user.
+The updated `allowed_signers` file must be transfered to all sshush servers used by Jane to allow the administrator to update the `authorized_keys` file related to Jane's sshush-key user. Example:
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
-$ for i in server3 server4
-do
-  sftp -qi ./id_ed25519_jane $JANEKEY@$i << EOT
-@put allowed_signers
-EOT
-done
+root@minipc1:~/age# sftp -qi ./id_ed25519_jane $JANEKEY@server3
+sftp> ls -1
+ask-UVatAmQs9VTvYBJTfkGAZ1EKWqAZoJuqyHLRcjQ6JV6idfCuxUJeCXRmGT24uBRKWvxkgY2S62QSkBZiotQcnuv
+cfg-n9ohTb45UjUuQGKtoVXNTQUFcoBpVhivJ8LdgVt2h82yRtJospkPZRMrGjTumMy6L73Pr5GzzpWB2CnSdo9Ktfd
+new
+sftp> rm cfg-n9ohTb45UjUuQGKtoVXNTQUFcoBpVhivJ8LdgVt2h82yRtJospkPZRMrGjTumMy6L73Pr5GzzpWB2CnSdo9Ktfd/allowed_signers
+sftp> put allowed_signers cfg-n9ohTb45UjUuQGKtoVXNTQUFcoBpVhivJ8LdgVt2h82yRtJospkPZRMrGjTumMy6L73Pr5GzzpWB2CnSdo9Ktfd
+sftp> exit
 ```
 That's all, in few  minutes, John will be able to upload email for Jane to `server3` or `server4` using ̀`@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym` as username.
 
 ## Server side operations
 What's going on in `server3` or `server4` with the new `allowed_signers` file for Jane? Simply rebuild her `authorized_keys` file with the updated data. Maybe some new contact added and maybe some useless one deleted...
 
+Find newer `allowed_signers`:
+```
+root@minipc1:/chroot/authorized_keys# while read U ; do A=$(ls -1 /chroot/$U/cfg-*/allowed_signers 2>/dev/null) && [ $A -nt $U ] && echo $A ; done < <(ls -1)
+/chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/cfg-n9ohTb45UjUuQGKtoVXNTQUFcoBpVhivJ8LdgVt2h82yRtJospkPZRMrGjTumMy6L73Pr5GzzpWB2CnSdo9Ktfd/allowed_signers
+```
 Mandatory limited access for Jane:
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
 
-$ echo "restrict,command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove\" $KEYTYPE $PUBKEY" > \
+$ echo "restrict,command=\"internal-sftp -p open,close,write,opendir,realpath,stat,remove,rename,setstat,read,lstat -u 337" $KEYTYPE $PUBKEY" > \
 > /chroot/authorized_keys/${JANEKEY}
 ```
-Ultra-limited access for Jane authorized contact. A dedicated folder is needed for each allowed sshush-key.
+Ultra-limited access for Jane authorized contact.
 ```
 $ cat allowed_signers | while read SSHUSHKEY KEYTYPE SSHPUBKEY
 do
-   echo "restrict,command=\"internal-sftp -d /$SSHUSHKEY -p open,close,write,realpath,stat -u 775\" \
+   echo "restrict,command=\"internal-sftp -d /new -p open,close,write,realpath,stat -u 377" \
 > $KEYTYPE $SSHPUBKEY" >> /chroot/authorized_keys/$JANEKEY
-   mkdir -p /chroot/$JANEKEY/$SSHUSHKEY
-   chown $JANEKEY:sshush /chroot/$JANEKEY/$SSHUSHKEY 
 done
 ```
 John is now allowed to upload email to Jane folder.
 
 # Primary contact
 
-## Client side operation
+## Jane side operation
 
 Jane is now ready to ask John for a primary contact agreement. She need to create 2 files with private information only accessible to John (ex: your real name and full sshush email address, encrypted with the `age` tool and John public ssh-key).
 
@@ -175,50 +180,32 @@ EOT
 ```
 if `server1` is offline, just use `server2`.
 
-## Server side operations
-
-To fight spamming, the server is able to validate the request for agreement ssh signature, but not to break the metadata privacy.
+## John side operaions
+John is finding the new request when pooling his server for new request. Example:
 ```
-$ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
-$ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
-$ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
-$ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
-$ echo $JANEKEY $KEYTYPE $PUBKEY > RAF_signers
-$ fold -s RAF_signers
-@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-
-$ ssh-keygen -Y verify -f RAF_signers -I $JANEKEY -n sshush -s ${JANEKEY}.sig < $JANEKEY
-Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-   with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
+# sftp -qi ./id_ed25519_john $JOHNKEY@server1
+sftp> cd ask-pWDu1A26qtDBN12ohpPEj9mULAPwUanGZcWaKZUYMix1sSrwwFk4uAmgDTpS2U6Axcs2K7EyBQuRUxjsZNjftjb/
+sftp> ls -l
+----r-----    1 1005     1002          314 Feb 26 22:51 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+----r-----    1 1005     1002          298 Feb 26 22:51 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
+sftp> get @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+sftp> rm @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
+sftp> get @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
+sftp> rm @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym.sig
+sftp> exit
 ```
-Signature is correct. Move the request to John folder:
-```
-$ mv $JANEKEY ${JANEKEY}.sig /chroot/$JOHNKEY/requests/
-```
-## Client side operaions
-John is finding the new request when pooling his server for new request.
-```
-$ for i in server1 server2
-do
-  sftp -i ./id_ed25519_john @@$i << EOT
-@get *
-EOT
-done
-```
-
 He check the signature.
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
 $ PUBKEY=$(echo $JANEKEY | cut -c 2- | base58 -d | base64)
 $ KEYTYPE=$(echo $PUBKEY | sed 's/AAAA/ /g' | cut -d ' ' -f 2 | base64 -d | tr -dc [a-z-0-9])
-$ echo $JANEKEY $KEYTYPE $PUBKEY > RAF_signers
-$ fold -s RAF_signers
+$ echo $JANEKEY $KEYTYPE $PUBKEY > signer
+$ fold -s signer
 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
 ssh-ed25519 AAAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
 
-$ ssh-keygen -Y verify -f RAF_signers -I $JANEKEY -n sshush -s ${JANEKEY}.sig < $JANEKEY
+$ ssh-keygen -Y verify -f signer -I $JANEKEY -n sshush -s ${JANEKEY}.sig < $JANEKEY
 Good "sshush" signature for @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
    with ED25519 key SHA256:yWuAxYn/r52czjTeZySHdVIHY82w6ChyQ2LFNXhj3WY
 ```
@@ -229,37 +216,39 @@ $ age -d -i ./id_ed25519_john $JANEKEY
 ```
 Ok I know Jane, she is a friend, I will accept email from her:
 ```
-cat RAF_signers >> allowed_signers
+cat signer >> allowed_signers
 ```
-Update all my sshush server with my new `allowed_signers` file:
+Update all my sshush server with my new `allowed_signers`. Example:
 ```
-$ for i in server1 server2
-do
-  sftp -i ./id_ed25519_john $JOHNKEY@$i << EOT
-@put allowed_signers
-EOT
-done
+# sftp -qi ./id_ed25519_john $JOHNKEY@server1
+sftp> ls -1
+ask-pWDu1A26qtDBN12ohpPEj9mULAPwUanGZcWaKZUYMix1sSrwwFk4uAmgDTpS2U6Axcs2K7EyBQuRUxjsZNjftjb
+cfg-3wjDAdWfg2RgWWvzMSaikv67ZCi2k1pNrnitdJvv2djZQ975zGBgJ52BJLpSGaNHqcmxU1u5oSTUme8m8ceSsMam
+new
+sftp> rm cfg-3wjDAdWfg2RgWWvzMSaikv67ZCi2k1pNrnitdJvv2djZQ975zGBgJ52BJLpSGaNHqcmxU1u5oSTUme8m8ceSsMam/allowed_signers
+sftp> put allowed_signers cfg-3wjDAdWfg2RgWWvzMSaikv67ZCi2k1pNrnitdJvv2djZQ975zGBgJ52BJLpSGaNHqcmxU1u5oSTUme8m8ceSsMam
+sftp> exit
 ```
 ## Regular contact
-
 Let's inform Jane with a regular email. Using date from epoch is a practical way to avoid duplicate filename:
 ```
 $ JANEKEY='@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym'
 $ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
 
-date -u '+%s'
-1641250382
+$ MSG=$(date -u '+%s')-${JOHNKEY}.txt
+$ echo $MSG
+1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JW
 $ echo "Welcome to my network Jane Doe, have a good day." | age -r "$(fgrep $JANEKEY allowed_signers \
-> | cut -d ' ' -f 2- )" > 1641250382.txt
-$ ssh-keygen -Y sign -n sshush -f id_ed25519_john 1641250382.txt
-Signing file 1641250382.txt
-Write signature to 1641250382.txt.sig
+> | cut -d ' ' -f 2- )" > $MSG
+$ ssh-keygen -Y sign -n sshush -f id_ed25519_john $MSG
+Signing file 1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm.txt
+Write signature to 1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm.txt.sig
 $ sftp -i id_ed25519_john $JANEKEY@server3 << EOT
-@put 1641250382.txt
-@put 1641250382.txt.sig
+cd new
+@put 1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm.txt
+@put 1641250382-@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm.txt.sig
 EOT
 ```
-
 # Server configuration
 ## Folders
 ### First level
