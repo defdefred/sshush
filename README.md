@@ -8,7 +8,7 @@ You can't send binary data with SMTP, so all is bloated.
 
 Metadata are accessible to all.
 
-You can't always keep the same name when changing domain.
+You can't always keep the same email when changing domain.
 
 SPAM must be eradicated.
 
@@ -21,11 +21,11 @@ You are creating your own sshush email address.
 
 Two servers are enought for most of people to be always online.
 
-Your ssh-key is unique to you and you are creating it by youself.
+Your ssh-key is uniq to you and you are creating it by youself.
 
 Example of ed25519 public ssh-keys:
 ```
-ssh-keygen -t ed25519
+$ ssh-keygen -t ed25519
 Generating public/private ed25519 key pair.
 Enter file in which to save the key (/root/.ssh/id_ed25519): ./id_ed25519_john
 Enter passphrase (empty for no passphrase):
@@ -46,9 +46,9 @@ The key's randomart image is:
 |   . . +Eo.+oo   |
 |   .o  .== o=o.  |
 +----[SHA256]-----+
-cat id_ed25519_john.pub
+$ cat id_ed25519_john.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty John Doe (id_ed25519_john)
-cat id_ed25519_jane.pub
+$ cat id_ed25519_jane.pub
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_jane)
 ```
 Dedicated ssh-key for SSHush minimal access to server when asking for contact agreement:
@@ -95,7 +95,7 @@ The `contact` file is usefull to know the sshush-key email of John Doe and the s
 ```
 $ echo "<John Doe>@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm[server1,server2]" >> contact
 ```
-The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as an pseudo-anonymous reference.
+The `allowed_signers` file is an openssh standard file to allow signature verification and we add the sshush-key as a pseudo-anonymous reference.
 ```
 $ JOHNKEY='@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm'
 $ PUBKEY=$(echo $JOHNKEY | cut -c 2- | base58 -d | base64)
