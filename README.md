@@ -311,52 +311,34 @@ drwxr-x--- 6 root                                                               
 -r-------- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush  384 Jan  6 01:14 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
 ```
 ## Ssh authorized_keys files
-# `@` user
+### `@` user
 ```
 root@minipc1:/chroot/authorized_keys# cat @
-restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 777" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A
+restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 737" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A
 ```
-Only allowed to change directory to the target sshush user and to write a file asking for permission to send sshush mail.
+Only allowed to change directory to the target sshush user and to write files asking for permission to send sshush mail.
 
-# for sshush users
+### for sshush users
 ```
 root@minipc1:/chroot/authorized_keys# cat @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-restrict,command="internal-sftp -p open,close,write,opendir,readdir,realpath,stat,remove,setstat,read,lstat" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-restrict,command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm -p open,close,write,realpath,stat -u 777" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
+restrict,command="internal-sftp -p rename,open,close,write,opendir,readdir,realpath,stat,remove,setstat,read,lstat -u 337" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
+restrict,command="internal-sftp -d /new -p open,close,write,realpath,stat -u 377" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
 ```
-```
-
-```
-
-## Sshush admin user
-```
-$ /sbin/useradd -d /chroot/ -g sshush -s /usr/sbin/nologin sshush
-```
-
-## Primary contact
-
-SSHd configuration (chroot, sftp restriction and umask to prevent overwriting files):
+## Sshd configuration
 ```
 $ cat /etc/ssh/sshd_config.d/sshush.conf
 Match user @*
     AuthorizedKeysFile /chroot/authorized_keys/%u
     ChrootDirectory %h
 ```
-Folder creation for chrooted environnement:
-```
-$ mkdir /chroot
-$ chmod 755 /chroot
-$ mkdir /chroot/authorized_keys
-$ chmod 755 /chroot/authorized_keys
-$ mkdir /chroot/@
-$ chmod 755 /chroot/@
-$ echo 'restrict,command="internal-sftp -p open,close,write,opendir,realpath,stat -u 775" ssh-ed25519 \
-AAAAC3NzaC1lZDI1NTE5AAAAILyryXfnjMZoczLIywctsEZPLMf70BwTLmxGQPE5cI7A' > /chroot/authorized_keys/@
-$ chmod 644 /chroot/authorized_keys/@
-```
-`@` user creation
+## User creation
+### Sshush admin user
 ```
 $ groupadd sshush
+$ useradd -d /chroot/ -g sshush -s /usr/sbin/nologin sshush
+```
+### `@` user
+```
 $ useradd --badnames -d /chroot/@ -g sshush -s /usr/sbin/nologin @
 ```
 `@` user can't write more than 1KB per files.
@@ -364,64 +346,15 @@ $ useradd --badnames -d /chroot/@ -g sshush -s /usr/sbin/nologin @
 $ cat /etc/security/limits.d/@.conf
 @       hard    fsize   1
 ```
-Folder creation for email address
+### Sshush mail user
 ```
-TODO
+root@minipc1:~# /sbin/useradd -d /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -g sshush -s /usr/sbin/nologin  @@
 ```
-## Regular contact
-```
-drwxr-xr-x 3 root                                                                  root   4096 Jan  6 02:13 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
--rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym sshush  383 Jan  6 02:11 @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
-drwxr-xr-x 3 root                                                                  root   4096 Jan  6 00:57 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
--rw-r--r-- 1 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm sshush  384 Jan  6 01:14 @111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
-
-
-root@minipc1:/chroot# /sbin/useradd --badnames -d /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU -g sshush -s /bin/false __
-root@minipc1:/chroot# mkdir /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
-root@minipc1:/chroot# cat /root/age/id_ed25519_2.pub > /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU_authorized_keys
-
-`vi /etc/passwd` and `vi /etc/shadow` to change `__` by `_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU`
-root@minipc1:/chroot# sftp -i /root/age/id_ed25519_2 _111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU@localhost
-Connected to localhost.
-sftp> pwd
-Remote working directory: /
-sftp> ls
-Couldn't read directory: Permission denied
-
-root@minipc1:/chroot# /sbin/useradd --badnames -d /chroot/_111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU -g sshush -s /bin/false  __
-root@minipc1:/chroot# ln -s -- _111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU -111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU
-root@minipc1:/chroot# cat /root/age/id_ed25519.pub > -111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU_authorized_keys
-`vi /etc/passwd` and `vi /etc/shadow` to change `__` by `-111RN3t1cWCcecTLM26gmqhceEPJtchvH98AuNGEBhAfHzTsmK8vJjTgUwnkoytVrXoU`
-```
-
-## create user jane
- 737  /sbin/useradd --badnames -d /chroot/@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -g sshush -s /usr/sbin/nologin _
-  738  vi /etc/passwd
-  739  vi /etc/shadow
-  740  cat /chroot/\@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
-  741  cat > /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
-  742  mkdir /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym
-  743  touch /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/allowed_signers
-  744  chown @111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym:sshush /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/allowed_signers
-  745  mkdir /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-  746  chmod 777 /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym/@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm
-
-
-root@minipc1:~/age# cat /chroot/\@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym_authorized_keys
-command="internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
-
-## create user john
-
-root@minipc1:~/age# cat /chroot/\@111RN3t1cWCcecTLM26gmqhcmA6wJMHu1JFuDL83JAxwc9e5XRJKVtYaG8mVkci49JWm_authorized_keys
-command="internal-sftp -P mkdir,rmdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty
-command="internal-sftp -d /@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym -P readdir,remove,mkdir,rmdir,chdir,setstat,fsetstat -u 775" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs
-
+`vi /etc/passwd` and `vi /etc/shadow` to change `@@` by `@111RN3t1cWCcecTLM26gmqhce3LDjoBkpaBgq1jjKSUb6juugbvf3pBB768Rn6pU3Vym`
 # What Next?
 Maybe, the ancien tcp port 25 could be used...
 
 Manual Proof Of Concept is fine, but who will developpe a real client ?
-
 
 # Links
 https://www.openssh.com/
