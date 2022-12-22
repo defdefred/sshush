@@ -2,11 +2,12 @@
 Beyond smtp mail.
 
 # Why? Really?
-It's time to move on. All very old protocol like FTP or SMTP are so fucked:
+All very old protocol like FTP or SMTP are so fucked:
 - You can't send binary data with SMTP, so all is bloated.
 - Metadata are accessible to all.
 - You can't always keep the same email when changing domain.
 - SPAM must be eradicated.
+It's time to move on:
 - Should be easily home hosted or shoudn't need excessive trust to the hosting server.
 - You are creating your own sshush email address.
 
