@@ -23,7 +23,14 @@ Two servers are enought for most of people to be always online.
 
 Your ssh-key is unique to you and you are creating it by youself.
 
-Example of ed25519 public ssh-keys:
+Examples of ed25519 public ssh-keys:
+```
+cat id_ed25519_john.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOYzWcb+bZKh1lKsSC+G/hICMdVNthuUwJzUHwANlcty John Doe (id_ed25519_john)
+cat id_ed25519_jane.pub
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHx1fwSGUGmO3n2FqKnWAm0ErbQ26A37rglryJuPTnPs Jane Doe (id_ed25519_jane)
+```
+Creation of ed25519 public ssh-keys:
 ```
 ssh-keygen -t ed25519
 Generating public/private ed25519 key pair.
