@@ -2,19 +2,13 @@
 Beyond smtp mail.
 
 # Why? Really?
-It's time to move on. All very old protocol like FTP or SMTP are so fucked...
-
-You can't send binary data with SMTP, so all is bloated.
-
-Metadata are accessible to all.
-
-You can't always keep the same email when changing domain.
-
-SPAM must be eradicated.
-
-Should be easily home hosted or shoudn't need excessive trust to the hosting server.
-
-You are creating your own sshush email address.
+It's time to move on. All very old protocol like FTP or SMTP are so fucked:
+- You can't send binary data with SMTP, so all is bloated.
+- Metadata are accessible to all.
+- You can't always keep the same email when changing domain.
+- SPAM must be eradicated.
+- Should be easily home hosted or shoudn't need excessive trust to the hosting server.
+- You are creating your own sshush email address.
 
 # SSHush Address
 1 user = 1 public ssh-key and one or many server where you can receive mail.
